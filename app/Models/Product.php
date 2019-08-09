@@ -15,12 +15,7 @@ class Product extends Model
         'name', 
         'description',
         'price',
-        'comparative_price',
-        'front_image',
         'quantity',
-        'back_image',
-        'unit_id',
-        'sub_category_id'
     ];
 
     public function units(){
@@ -33,8 +28,12 @@ class Product extends Model
     {
         return $this->morphMany('App\Models\Image', 'imageable');
     }
-    public function sub_categories(){
-        return $this->belongsTo('App\Models\SubCategory');
+    public function categorize(){
+        return $this->morphMany('App\Models\Category', 'categorizeable');
+    }
+    public function categories()
+    {
+        return $this->morphToMany('App\Models\Category', 'categorizeable');
     }
 }
 

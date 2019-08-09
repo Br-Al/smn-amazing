@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input; 
 
 class ProductController extends Controller
 {
@@ -14,7 +16,11 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        $products = Product::all();
+        foreach ($products as $product) {
+           $products->images;
+        }
+        return response()->json($products);
     }
 
     /**
@@ -46,31 +52,42 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request);
+           
+        $path = public_path().'/img/product-images/';
+        //dd(json_decode($request->get('categories_id')));
+        // dd($request-json()->all());
+        //dd($request->get('subCategories_id'));
         
         $request->validate([
             'name' => 'required|string',
             'description' =>'required|string|max:1000',
             'price' =>'required|integer',
-            'comparative_price' =>'required|integer',
+           
             'quantity' =>'required|integer',
-            'subCategory_id' =>'required|integer',
-            'unit_id' =>'required|integer',
+            'categories_id' =>'required',
+           
         ]);
         $product = Product::create([
             'name' => $request->name,
             'description' => $request->description,
             'price' =>$request->price,
-            'comparative_price' =>$request->comparative_price,
             'quantity' =>$request->quantity,
-            'unit_id' =>$request->unit_id,
-            'sub_category_id' =>$request->subCategory_id
         ]);
-        foreach ($request->get('images') as $image) {
-            $product->images->create([
-                'path' => $image->store()
+      
+        foreach (json_decode($request->get('categories_id')) as $id) {
+            $category = Category::findOrFail(json_decode($id));
+            $product->categories()->attach($category->id);
+        }
+        foreach ($request->files as $image) {
+            $image_name = $product->name.'-'.rand(10, 99999999).'.'.$image->getClientOriginalExtension();
+
+            $image->move($path, $image_name);
+            $product->images()->create([
+                'url' => env('APP_URL').'/img/product-images/'.$image_name,
+                'alt' => env('APP_NAME').' '.$product->name,
             ]);
         }
+        
         return response()->json([
             'message' => 'Successfully created product!'
         ], 201);

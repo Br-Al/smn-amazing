@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateClassifiedsTable extends Migration
+class Categorize extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,14 @@ class CreateClassifiedsTable extends Migration
      */
     public function up()
     {
-        Schema::create('classifieds', function (Blueprint $table) {
+        Schema::create('categorize', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('category_id');
-            $table->string('title');
-            $table->string('type');
-            $table->text('description');
+            $table->unsignedBigInteger('parent_id')->default(0);
+            $table->unsignedBigInteger('child_id');
             $table->timestamps();
-            $table->foreign('category_id')->references('id')->on('categories');
+            $table->foreign('parent_id')->references('id')->on('categories');
+            $table->foreign('child_id')->references('id')->on('categories');
+
         });
     }
 
@@ -31,6 +31,6 @@ class CreateClassifiedsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('classifieds');
+        Schema::dropIfExists('categorize');
     }
 }

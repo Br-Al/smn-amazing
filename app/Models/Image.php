@@ -12,7 +12,7 @@ class Image extends Model
      * @var array
      */
     protected $fillable = [
-        'path', 'imageable_type', 'imageable_id'
+        'url', 'imageable_type', 'imageable_id', 'alt'
     ];
     /**
      * Get all of the owning commentable models.

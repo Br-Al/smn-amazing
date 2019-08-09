@@ -19,12 +19,7 @@ class CreateProductsTable extends Migration
             $table->text('description');
             $table->unsignedInteger('quantity');
             $table->float('price');
-            $table->float('comparative_price');
-            $table->unsignedBigInteger('unit_id');
-            $table->unsignedBigInteger('sub_category_id');
             $table->timestamps();
-            $table->foreign('unit_id')->references('id')->on('units');
-            $table->foreign('sub_category_id')->references('id')->on('sub_categories');
         });
     }
 

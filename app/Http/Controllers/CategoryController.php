@@ -16,10 +16,25 @@ class CategoryController extends Controller
     {
         $categories = Category::all();
         foreach ($categories as $category) {
-            
-            $category->sub_categories;
-            foreach ($category->sub_categories as $subCategory) {
-                $subCategory->types;
+            foreach ($category->categorize as $subCategory) {
+                $subCategory->categorize;
+            }
+        }
+        return response()->json(
+            $categories
+        );
+    }
+    /**
+     * Display a listing of the categories that doesn't have parent.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function rootCategory()
+    {
+        $categories = Category::whereNotparent();
+        foreach ($categories as $category) {
+            foreach ($category->categorize as $subCategory) {
+                $subCategory->categorize;
             }
         }
         return response()->json(
@@ -49,12 +64,18 @@ class CategoryController extends Controller
             'name' => 'required|string',
             'description' =>'required|string|max:1000'
         ]);
-        $category = new Category([
+        $category = Category::create([
             'name' => $request->name,
             'description' => $request->description
         ]);
-        $category->save();
-
+        $parents = $request->get('parents'); 
+        if ($parents != null){
+            //dd($parents);
+            foreach ($parents as $id) {
+                $sub_category = Category::findOrFail($id);
+                $sub_category->categorize()->attach($category->id);
+            }
+        }
         return response()->json([
             'message' => 'Successfully created user!'
         ], 201);
